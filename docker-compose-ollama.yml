@@ -16,8 +16,27 @@ services:
     environment:
       - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-me-in-production}
     depends_on:
+      - ollama
       - whisper-server
       - piper-server
+    restart: unless-stopped
+
+  # ── Ollama (LLM) ──────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mirabot-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+   # Uncomment for GPU passthrough:
+   # deploy:
+   #   resources:
+   #     reservations:
+   #       devices:
+   #         - driver: nvidia
+   #           count: all
+   #           capabilities: [gpu]
     restart: unless-stopped
 
   # ── faster-whisper (STT) ───────────────────────────────
@@ -50,4 +69,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  mirabot_data:
+  mirabot_data:   
+#  ollama_data:

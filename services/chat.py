@@ -25,7 +25,7 @@ class ChatService:
         """
         Full pipeline: audio → text → LLM → speech.
         """
-        # ── 1. Speech-to-Text ────────────────────────────
+        # Speech-to-Text
         log.info("STT: transcribing %d bytes (%s)", len(audio_bytes), mime_type)
         user_text = self.stt.transcribe(audio_bytes, mime_type)
         log.info("STT result: %s", user_text)
@@ -37,7 +37,7 @@ class ChatService:
                 "audio_b64": self._silent_audio_b64(),
             }
 
-        # ── 2. Build message list ────────────────────────
+        # Build message list
         messages = []
 
         # System prompt + calendar context
@@ -54,15 +54,16 @@ class ChatService:
         if system:
             messages.append({"role": "system", "content": system})
 
+        # Append user message to the prompts and context
         messages.extend(context)
         messages.append({"role": "user", "content": user_text})
 
-        # ── 3. LLM ──────────────────────────────────────
+        # LLM chat
         log.info("LLM: sending %d messages", len(messages))
         response_text = self.llm.chat(messages)
         log.info("LLM result: %s", response_text[:120])
 
-        # ── 4. Text-to-Speech ────────────────────────────
+        # Text-to-Speech
         log.info("TTS: synthesizing %d chars", len(response_text))
         wav_bytes = self.tts.synthesize(response_text)
         audio_b64 = base64.b64encode(wav_bytes).decode("ascii")

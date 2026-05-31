@@ -1,5 +1,5 @@
 /**
- * MirrorApp — wires audio, face, API, and conversation history together.
+ * Mira Bot App — wires audio, face, API, and conversation history together.
  */
 (async function () {
     const audio = new AudioManager();

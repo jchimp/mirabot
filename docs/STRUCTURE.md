@@ -1,6 +1,6 @@
 # Project Structure
 
-mirrormate-flask/
+mirabot/
 ├── app.py                          # Flask entry point
 ├── config.yaml                     # All service endpoints (the "lego blocks" config)
 ├── requirements.txt

@@ -1,5 +1,5 @@
 """
-MirrorMate Flask — main application.
+Mira Bot — main application.
 """
 import os
 import json
@@ -39,13 +39,13 @@ providers = create_providers(config)
 # ── Memory ───────────────────────────────────────────────
 memory_config = config.get("memory", {})
 memory = MemoryStore(
-    db_path=memory_config.get("db_path", "data/mirror.db"),
+    db_path=memory_config.get("db_path", "data/mirabot.db"),
     context_window=memory_config.get("context_window", 20),
 )
 
 # ── Token Store ──────────────────────────────────────────
 token_store = TokenStore(
-    db_path=memory_config.get("db_path", "data/mirror.db"),
+    db_path=memory_config.get("db_path", "data/mirabot.db"),
     secret_key=app.secret_key,
 )
 
@@ -95,7 +95,7 @@ def index():
     default_theme = assistant.get("default_theme", "mirror")
     default_face = assistant.get("default_face", "face")
     transform_volume = assistant.get("transform_volume", 0.5)
-    return render_template("mirror.html",
+    return render_template("index.html",
                            assistant_name=name,
                            default_theme=default_theme,
                            default_face=default_face,

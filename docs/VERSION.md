@@ -1,6 +1,9 @@
 # Version History
 
 ## 1.2.0 - 2026-05-01
+    - Changed name to: Mira Bot (mirabot). 
+        Update README, config.yaml, docker-compose, etc. 
+        Renamed mirror.html -> index.html, mirror.css -> style.css.
     - Adding query Outlook/Google calendar
         - Adding OAuth 2.0 Authentication with Device Code login URL for Google and Microsoft accounts.
         - We will store the OAuth token in the SQLite DB.

@@ -2,13 +2,14 @@
 
 ## 2026-05-01
 
-- FINALIZE NAME OF PROJECT. Rename FOLDERs, DOCKER, DOCKER COMPOSE, CONFIG.yaml. Update VERSION.md with note of change
+- Voice selection, either in config or in UI as option.
+- Lighen UI mode.
+- Add text box to UI mode. But leave the focus on the page for space bar to work.
+- Add wake word "Hey mira"
 
 - When reading back the response, if it's long, the reponse ends up "behind" the mic button. Not sure how to hide/slide/move it.
 
 - Work on mouth animation maybe. Increase speed or change in amplitude.
-
-- Add Calendar API to read calendar events for summaries
 
 - RAG - can we get it to read additional information. Might be better just for a chat based program and take out the TTS/SST.
 

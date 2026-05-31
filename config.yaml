@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────
-# MirrorMate Flask — Service Configuration
+# Mira Bot — Service Configuration
 # Swap any provider by changing "provider" and "url".
 # No code changes required.
 # ─────────────────────────────────────────────────────────
@@ -8,9 +8,9 @@ app:
   debug: false
 
 assistant:
-  name: "Mirror"
+  name: "Mira"
   system_prompt: >
-    You are Mirror, a friendly and concise AI assistant embedded in a
+    You are Mira, a friendly and concise AI assistant embedded in a
     smart mirror. Keep responses brief and conversational — one to three
     sentences unless the user asks for detail. When asked about schedule
     or calendar, use the calendar context provided to give accurate answers.
@@ -46,7 +46,7 @@ llm:
 
 # ── Conversation Memory ──────────────────────────────────
 memory:
-  db_path: "/data/mirror.db"
+  db_path: "/data/mirabot.db"
   context_window: 20                  # max messages sent to LLM per turn
 
 # ── Calendar Integration ─────────────────────────────────
