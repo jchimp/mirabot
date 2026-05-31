@@ -1,0 +1,8 @@
+flask>=3.0
+gunicorn>=22.0
+pyyaml>=6.0
+requests>=2.31
+google-auth>=2.29
+google-auth-oauthlib>=1.2
+google-api-python-client>=2.130
+cryptography>=42.0

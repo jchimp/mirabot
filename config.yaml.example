@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────
+# MirrorMate Flask — Service Configuration
+# Swap any provider by changing "provider" and "url".
+# No code changes required.
+# ─────────────────────────────────────────────────────────
+
+app:
+  debug: false
+
+assistant:
+  name: "Mirror"
+  system_prompt: >
+    You are Mirror, a friendly and concise AI assistant embedded in a
+    smart mirror. Keep your responses brief and conversational—1 to 3
+    sentences unless the user asks for more detail.
+
+# ── Speech-to-Text ───────────────────────────────────────
+# Providers: faster_whisper | openai
+stt:
+  provider: "faster_whisper"
+  url: "http://whisper-server:9000"   # service name from docker-compose, not 'localhost'
+  model: "base"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Text-to-Speech ───────────────────────────────────────
+# Providers: piper | openai
+tts:
+  provider: "piper"
+  url: "http://piper-server:5000"     # service name from docker-compose, not 'localhost'
+  voice: "en_US-lessac-medium"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Large Language Model ─────────────────────────────────
+# Providers: ollama | openai
+llm:
+  provider: "ollama"
+  url: "http://host.docker.internal:11434"     # Running locally, host machine
+  model: "llama3"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Conversation Memory ──────────────────────────────────
+memory:
+  db_path: "/data/mirror.db"
+  context_window: 20                  # max messages sent to LLM per turn

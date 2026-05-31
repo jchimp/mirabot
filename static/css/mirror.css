@@ -1,0 +1,711 @@
+/* ─────────────────────────────────────────────
+   MirrorMate — Theme System
+   Two themes: "mirror" (pure black) and "slate" (dark grey)
+   Toggle via data-theme attribute on <html>
+   ───────────────────────────────────────────── */
+
+/* ── Theme: Mirror (default — pure black) ──── */
+:root,
+[data-theme="mirror"] {
+    --bg:               #000000;
+    --bg-elevated:      rgba(255, 255, 255, 0.02);
+    --bg-panel:         rgba(10, 10, 10, 0.97);
+    --face-color:       #e0e0e0;
+    --face-pupil:       #111111;
+    --glow-idle:        rgba(224, 224, 224, 0.05);
+    --glow-idle-peak:   rgba(224, 224, 224, 0.12);
+    --glow-speak:       rgba(224, 224, 224, 0.15);
+    --glow-listen:      rgba(224, 224, 224, 0.10);
+    --text-primary:     rgba(255, 255, 255, 0.55);
+    --text-secondary:   rgba(255, 255, 255, 0.25);
+    --text-muted:       rgba(255, 255, 255, 0.15);
+    --text-dim:         rgba(255, 255, 255, 0.3);
+    --border:           rgba(255, 255, 255, 0.06);
+    --border-hover:     rgba(255, 255, 255, 0.15);
+    --border-active:    rgba(255, 255, 255, 0.3);
+    --btn-bg:           rgba(255, 255, 255, 0.03);
+    --btn-bg-hover:     rgba(255, 255, 255, 0.07);
+    --btn-color:        rgba(255, 255, 255, 0.6);
+    --btn-border:       rgba(255, 255, 255, 0.15);
+    --btn-border-hover: rgba(255, 255, 255, 0.3);
+    --ring-color:       rgba(255, 255, 255, 0.08);
+    --ring-peak:        rgba(255, 255, 255, 0.15);
+    --danger:           #ef4444;
+    --danger-bg:        rgba(239, 68, 68, 0.08);
+    --danger-border:    rgba(239, 68, 68, 0.5);
+    --danger-glow:      rgba(239, 68, 68, 0.15);
+    --danger-glow-peak: rgba(239, 68, 68, 0.25);
+    --sidebar-bg:       rgba(10, 10, 10, 0.97);
+    --sidebar-active:   rgba(255, 255, 255, 0.06);
+    --sidebar-hover:    rgba(255, 255, 255, 0.04);
+    --sidebar-accent:   rgba(255, 255, 255, 0.3);
+    --log-user:         rgba(255, 255, 255, 0.2);
+    --log-assistant:    rgba(255, 255, 255, 0.35);
+    --scrollbar:        rgba(255, 255, 255, 0.1);
+    --transcript-bg:    transparent;
+    --transcript-border: transparent;
+    --transcript-radius: 0;
+    --overlay-bg:       rgba(0, 0, 0, 0.5);
+}
+
+/* ── Theme: Slate (dark grey, more interactive) ── */
+[data-theme="slate"] {
+    --bg:               #13161b;
+    --bg-elevated:      #1c1f26;
+    --bg-panel:         #1a1d24;
+    --face-color:       #c8cdd5;
+    --face-pupil:       #0a0c10;
+    --glow-idle:        rgba(180, 190, 210, 0.06);
+    --glow-idle-peak:   rgba(180, 190, 210, 0.14);
+    --glow-speak:       rgba(140, 170, 220, 0.20);
+    --glow-listen:      rgba(100, 180, 255, 0.12);
+    --text-primary:     rgba(200, 210, 225, 0.75);
+    --text-secondary:   rgba(200, 210, 225, 0.40);
+    --text-muted:       rgba(200, 210, 225, 0.20);
+    --text-dim:         rgba(200, 210, 225, 0.35);
+    --border:           rgba(200, 210, 225, 0.08);
+    --border-hover:     rgba(200, 210, 225, 0.15);
+    --border-active:    rgba(200, 210, 225, 0.25);
+    --btn-bg:           rgba(200, 210, 225, 0.05);
+    --btn-bg-hover:     rgba(200, 210, 225, 0.10);
+    --btn-color:        rgba(200, 210, 225, 0.65);
+    --btn-border:       rgba(200, 210, 225, 0.12);
+    --btn-border-hover: rgba(200, 210, 225, 0.25);
+    --ring-color:       rgba(100, 180, 255, 0.10);
+    --ring-peak:        rgba(100, 180, 255, 0.22);
+    --danger:           #f87171;
+    --danger-bg:        rgba(248, 113, 113, 0.08);
+    --danger-border:    rgba(248, 113, 113, 0.4);
+    --danger-glow:      rgba(248, 113, 113, 0.12);
+    --danger-glow-peak: rgba(248, 113, 113, 0.22);
+    --sidebar-bg:       #161920;
+    --sidebar-active:   rgba(200, 210, 225, 0.07);
+    --sidebar-hover:    rgba(200, 210, 225, 0.04);
+    --sidebar-accent:   rgba(100, 180, 255, 0.5);
+    --log-user:         rgba(200, 210, 225, 0.25);
+    --log-assistant:    rgba(200, 210, 225, 0.45);
+    --scrollbar:        rgba(200, 210, 225, 0.12);
+    --transcript-bg:    rgba(200, 210, 225, 0.03);
+    --transcript-border: rgba(200, 210, 225, 0.06);
+    --transcript-radius: 12px;
+    --overlay-bg:       rgba(0, 0, 0, 0.6);
+}
+
+
+/* ─────────────────────────────────────────────
+   Base Styles (theme-aware via variables)
+   ───────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--bg);
+    color: var(--face-color);
+    font-family: 'Inter', 'SF Pro Display', system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* ── Layout ──────────────────────────────────── */
+#mirror {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    position: relative;
+}
+
+/* ── Face SVG ────────────────────────────────── */
+#face {
+    width: min(50vw, 320px);
+    height: auto;
+    transition: filter 0.6s ease;
+}
+
+.face-element {
+    fill: var(--face-color);
+    transition: fill 0.4s ease;
+}
+
+.pupil {
+    fill: var(--face-pupil);
+    transition: cx 0.4s ease, cy 0.4s ease, fill 0.4s ease;
+}
+
+.mouth-element {
+    stroke: var(--face-color);
+    transition: stroke 0.4s ease;
+}
+
+.eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.15s ease;
+}
+
+.eye.blinking {
+    animation: blink 0.18s ease-in-out;
+}
+
+@keyframes blink {
+    0%, 100% { transform: scaleY(1); }
+    50%      { transform: scaleY(0.08); }
+}
+
+/* ── Thinking dots ───────────────────────────── */
+.thinking-dots { opacity: 0; transition: opacity 0.3s ease; }
+.state-thinking .thinking-dots { opacity: 1; }
+
+.dot {
+    animation: dot-pulse 1.4s ease-in-out infinite;
+}
+.dot-2 { animation-delay: 0.2s; }
+.dot-3 { animation-delay: 0.4s; }
+
+@keyframes dot-pulse {
+    0%, 80%, 100% { opacity: 0.2; r: 3; }
+    40%           { opacity: 1;   r: 5; }
+}
+
+/* ── Listening ring ──────────────────────────── */
+.listen-ring {
+    stroke: var(--ring-color);
+    opacity: 0;
+    transition: opacity 0.4s ease, stroke 0.4s ease;
+}
+
+.state-listening .listen-ring {
+    opacity: 1;
+    animation: ring-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ring-pulse {
+    0%, 100% { r: 38; stroke-opacity: 0.06; }
+    50%      { r: 48; stroke-opacity: 0.15; }
+}
+
+/* ── State: idle ─────────────────────────────── */
+.state-idle #face {
+    animation: ambient-glow 4s ease-in-out infinite;
+}
+
+@keyframes ambient-glow {
+    0%, 100% { filter: drop-shadow(0 0 8px  var(--glow-idle)); }
+    50%      { filter: drop-shadow(0 0 20px var(--glow-idle-peak)); }
+}
+
+/* ── State: speaking ─────────────────────────── */
+.state-speaking #face {
+    filter: drop-shadow(0 0 16px var(--glow-speak));
+}
+
+/* ── State: listening ────────────────────────── */
+.state-listening #face {
+    filter: drop-shadow(0 0 12px var(--glow-listen));
+}
+
+/* ── Transcript ──────────────────────────────── */
+.transcript {
+    margin-top: 2rem;
+    text-align: center;
+    padding: 1rem 2rem;
+    max-width: 500px;
+    min-height: 3.5rem;
+    background: var(--transcript-bg);
+    border: 1px solid var(--transcript-border);
+    border-radius: var(--transcript-radius);
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+.user-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 0.4rem;
+    transition: color 0.4s ease, opacity 0.5s ease;
+}
+
+.mirror-text {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 300;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    transition: color 0.4s ease, opacity 0.5s ease;
+}
+
+/* ── Controls ────────────────────────────────── */
+.controls {
+    position: absolute;
+    bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-text {
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    color: var(--text-dim);
+    transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+/* ── Mic button ──────────────────────────────── */
+.mic-btn {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1.5px solid var(--btn-border);
+    background: var(--btn-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--btn-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.mic-btn:hover {
+    background: var(--btn-bg-hover);
+    border-color: var(--btn-border-hover);
+    transform: scale(1.06);
+}
+
+.mic-btn:active {
+    transform: scale(0.96);
+}
+
+.mic-btn.recording {
+    border-color: var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger);
+    box-shadow: 0 0 30px var(--danger-glow);
+    animation: pulse-mic 2s ease-in-out infinite;
+}
+
+@keyframes pulse-mic {
+    0%, 100% { box-shadow: 0 0 20px var(--danger-glow); }
+    50%      { box-shadow: 0 0 40px var(--danger-glow-peak); }
+}
+
+/* ── Clear button ────────────────────────────── */
+.clear-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    transition: color 0.3s ease;
+}
+
+.clear-btn:hover {
+    color: var(--text-dim);
+}
+
+/* ── Top Bar ─────────────────────────────────── */
+.top-bar {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    z-index: 10;
+}
+
+.icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    padding: 6px 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.25s ease;
+}
+
+.icon-btn:hover {
+    color: var(--btn-color);
+    border-color: var(--border-hover);
+    background: var(--btn-bg);
+}
+
+.session-title {
+    font-size: 0.7rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    max-width: 60vw;
+}
+
+/* ── Theme Toggle ────────────────────────────── */
+.theme-toggle {
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    padding: 5px 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    margin-left: auto;
+}
+
+.theme-toggle:hover {
+    color: var(--btn-color);
+    border-color: var(--border-hover);
+    background: var(--btn-bg-hover);
+}
+
+/* Show/hide the correct icon per theme */
+.theme-icon { display: none; }
+
+[data-theme="mirror"] .theme-icon-mirror { display: block; }
+[data-theme="slate"]  .theme-icon-slate  { display: block; }
+
+/* ── Sidebar ─────────────────────────────────── */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.4s ease, border-color 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar.open { transform: translateX(0); }
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: border-color 0.4s ease;
+}
+
+.sidebar-header h2 {
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    color: var(--text-dim);
+    margin: 0;
+}
+
+.sidebar-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.sidebar-btn:hover {
+    background: var(--btn-bg-hover);
+    color: var(--face-color);
+}
+
+/* ── Session List ────────────────────────────── */
+.session-list {
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+}
+
+.session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-left: 2px solid transparent;
+}
+
+.session-item:hover { background: var(--sidebar-hover); }
+
+.session-item.active {
+    background: var(--sidebar-active);
+    border-left-color: var(--sidebar-accent);
+}
+
+.session-item-info { flex: 1; min-width: 0; }
+
+.session-item-title {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-item-meta {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+.session-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: all 0.2s ease;
+}
+
+.session-item:hover .session-delete { opacity: 1; }
+
+.session-delete:hover {
+    color: var(--danger);
+    background: var(--danger-bg);
+}
+
+/* ── Conversation Log ────────────────────────── */
+.conversation-log {
+    max-height: 120px;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+    padding: 0 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
+}
+
+.log-message {
+    font-size: 0.7rem;
+    padding: 0.2rem 0;
+    line-height: 1.4;
+}
+
+.log-message.user {
+    color: var(--log-user);
+    font-style: italic;
+}
+
+.log-message.assistant {
+    color: var(--log-assistant);
+}
+
+/* ── Control Row ─────────────────────────────── */
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.control-dot {
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    line-height: 1;
+}
+
+/* ── Export button in sidebar ────────────────── */
+.session-export {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: all 0.2s ease;
+    margin-right: 2px;
+}
+
+.session-item:hover .session-export { opacity: 1; }
+
+.session-export:hover {
+    color: var(--btn-color);
+    background: var(--btn-bg-hover);
+}
+
+/* ── Sidebar Actions ─────────────────────────── */
+.sidebar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* ── Import toast notification ───────────────── */
+.import-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-hover);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.75rem;
+    color: var(--text-primary);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 200;
+    pointer-events: none;
+}
+
+.import-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ─────────────────────────────────────────────
+   Face Mode Toggle
+   ───────────────────────────────────────────── */
+
+/* Show/hide face vs HAL based on data-face attribute */
+.face-svg, .hal-svg {
+    width: min(50vw, 320px);
+    height: auto;
+    transition: filter 0.6s ease, opacity 0.4s ease;
+}
+
+.hal-svg  { display: none; }
+.face-svg { display: block; }
+
+[data-face="hal"] .hal-svg  { display: block; }
+[data-face="hal"] .face-svg { display: none; }
+
+/* Face toggle button icons */
+.face-icon { display: none; }
+[data-face="face"] .face-icon-face { display: block; }
+[data-face="hal"]  .face-icon-hal  { display: block; }
+
+
+/* ─────────────────────────────────────────────
+   HAL 9000 Eye
+   ───────────────────────────────────────────── */
+
+/* Idle breathing pulse */
+.state-idle .hal-svg {
+    animation: hal-idle-pulse 4s ease-in-out infinite;
+}
+
+@keyframes hal-idle-pulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 15px rgba(200, 0, 0, 0.15))
+                drop-shadow(0 0 40px rgba(200, 0, 0, 0.05));
+    }
+    50% {
+        filter: drop-shadow(0 0 25px rgba(200, 0, 0, 0.25))
+                drop-shadow(0 0 60px rgba(200, 0, 0, 0.10));
+    }
+}
+
+/* Listening state */
+.state-listening .hal-svg {
+    filter: drop-shadow(0 0 20px rgba(200, 0, 0, 0.20))
+            drop-shadow(0 0 50px rgba(200, 0, 0, 0.08));
+}
+
+.hal-listen-ring {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.state-listening .hal-listen-ring {
+    opacity: 1;
+    animation: hal-ring-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hal-ring-pulse {
+    0%, 100% { r: 82;  stroke-opacity: 0.08; }
+    50%      { r: 95;  stroke-opacity: 0.18; }
+}
+
+/* Thinking state */
+.state-thinking .hal-svg {
+    filter: drop-shadow(0 0 18px rgba(200, 0, 0, 0.18))
+            drop-shadow(0 0 45px rgba(200, 0, 0, 0.06));
+    animation: hal-think-flicker 1.5s ease-in-out infinite;
+}
+
+@keyframes hal-think-flicker {
+    0%, 100% { opacity: 1; }
+    30%      { opacity: 0.85; }
+    60%      { opacity: 0.95; }
+}
+
+/* Speaking state — base glow, amplitude modulated via JS */
+.state-speaking .hal-svg {
+    filter: drop-shadow(0 0 30px rgba(200, 0, 0, 0.30))
+            drop-shadow(0 0 70px rgba(200, 0, 0, 0.12));
+}
+
+
+/* ─────────────────────────────────────────────
+   Wider Transcript
+   ───────────────────────────────────────────── */
+
+.transcript {
+    max-width: 700px;          /* was 500px */
+    width: 90vw;
+}
+
+.conversation-log {
+    max-height: 150px;         /* slightly taller to match */
+}

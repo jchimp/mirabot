@@ -1,0 +1,68 @@
+services:
+  # ── Flask App ──────────────────────────────────────────
+  mirror:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mirror
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+    environment:
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY:-change-me-in-production}
+    depends_on:
+      - ollama
+      - whisper-server
+      - piper-server
+    restart: unless-stopped
+
+  # ── Ollama (LLM) ──────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mirror-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment for GPU passthrough:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped
+
+  # ── faster-whisper (STT) ───────────────────────────────
+  # Uses onerahmet/openai-whisper-asr-webservice with faster-whisper backend.
+  # Exposes /asr endpoint on port 9000.
+  whisper-server:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: mirror-whisper
+    ports:
+      - "9000:9000"
+    environment:
+      - ASR_MODEL=base            # Options: tiny, base, small, medium, large-v3
+      - ASR_ENGINE=faster_whisper
+    restart: unless-stopped
+
+  # ── Piper (TTS) ───────────────────────────────────────
+  # Custom thin HTTP wrapper around piper-tts.
+  # Voice models must be downloaded to ./piper-models/ (see README).
+  piper-server:
+    build:
+      context: ./piper-server
+      dockerfile: Dockerfile
+    container_name: mirror-piper
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./piper-models:/models:ro
+    environment:
+      - PIPER_DEFAULT_VOICE=en_US-lessac-medium
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

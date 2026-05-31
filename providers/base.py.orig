@@ -1,0 +1,45 @@
+"""
+Abstract base classes for all AI service providers.
+Every provider implements one of these interfaces.
+To add a new provider: subclass the ABC, implement the method, register in factory.py.
+"""
+from abc import ABC, abstractmethod
+
+
+class STTProvider(ABC):
+    """Speech-to-Text provider interface."""
+
+    def __init__(self, config: dict):
+        self.url = config.get("url", "")
+        self.model = config.get("model", "")
+
+    @abstractmethod
+    def transcribe(self, audio_bytes: bytes, mime_type: str = "audio/webm") -> str:
+        """Convert audio bytes to text."""
+        ...
+
+
+class TTSProvider(ABC):
+    """Text-to-Speech provider interface."""
+
+    def __init__(self, config: dict):
+        self.url = config.get("url", "")
+        self.voice = config.get("voice", "")
+
+    @abstractmethod
+    def synthesize(self, text: str) -> bytes:
+        """Convert text to WAV audio bytes."""
+        ...
+
+
+class LLMProvider(ABC):
+    """Large Language Model provider interface."""
+
+    def __init__(self, config: dict):
+        self.url = config.get("url", "")
+        self.model = config.get("model", "")
+
+    @abstractmethod
+    def chat(self, messages: list[dict]) -> str:
+        """Send conversation messages, return assistant's response text."""
+        ...

@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────
+# MirrorMate Flask — Service Configuration
+# Swap any provider by changing "provider" and "url".
+# No code changes required.
+# ─────────────────────────────────────────────────────────
+
+app:
+  debug: false
+
+assistant:
+  name: "Mirror"
+  system_prompt: >
+    You are Mirror, a friendly and concise AI assistant embedded in a
+    smart mirror. Keep responses brief and conversational — one to three
+    sentences unless the user asks for detail. When asked about schedule
+    or calendar, use the calendar context provided to give accurate answers.
+    You are based in Bozeman, MT, USA. You should try to add some sarcasim and puns when it feels appropriate. 
+    Be as quick and to the point as possible.
+  default_theme: "mirror"     # "mirror" (all black) or "slate" (dark grey)
+  default_face: "face"        # "face" (eyes + mouth) or "hal" (HAL 9000 eye) 
+  transform_volume: 0.5       # 0.0 to 1.0
+
+# ── Speech-to-Text ───────────────────────────────────────
+# Providers: faster_whisper | openai
+stt:
+  provider: "faster_whisper"
+  url: "http://whisper-server:9000"   # service name from docker-compose, not 'localhost'
+  model: "base"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Text-to-Speech ───────────────────────────────────────
+# Providers: piper | openai
+tts:
+  provider: "piper"
+  url: "http://piper-server:5000"     # service name from docker-compose, not 'localhost'
+  voice: "en_US-lessac-medium"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Large Language Model ─────────────────────────────────
+# Providers: ollama | openai
+llm:
+  provider: "ollama"
+  url: "http://host.docker.internal:11434"     # Running locally, host machine
+  model: "llama3"
+  # api_key: ""                       # Only needed for openai provider
+
+# ── Conversation Memory ──────────────────────────────────
+memory:
+  db_path: "/data/mirror.db"
+  context_window: 20                  # max messages sent to LLM per turn
+
+# ── Calendar Integration ─────────────────────────────────
+# Set provider to "none" to disable
+calendar:
+  provider: "google"
+  client_id: "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+  client_secret: "GOCSPX-YOUR_SECRET"
+  scopes:
+    - "https://www.googleapis.com/auth/calendar.readonly"
+  lookahead_days: 3
+  cache_ttl_minutes: 5
+  timezone: "America/Denver"
+  context_mode: "inject"           # "inject" into system prompt or "none"
+
+# ── Outlook.com (future — uncomment to use) ──────────────
+# calendar:
+#   provider: "outlook"
+#   client_id: "YOUR_AZURE_APP_CLIENT_ID"
+#   tenant: "consumers"
+#   scopes:
+#     - "Calendars.Read"
+#   lookahead_days: 3
+#   cache_ttl_minutes: 5
+#   timezone: "America/Denver"
+#   context_mode: "inject"
