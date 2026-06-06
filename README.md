@@ -362,15 +362,32 @@ calendar:
   context_mode: "inject"
 ```
 
-#### Step 6: Rebuild and authenticate
+#### Step 6: Expose the OAuth callback port
 
-```bash
-docker compose build --no-cache mirror
-docker compose up -d mirror
-docker exec -it mirror flask calendar-setup
+The OAuth flow requires port `8090` to be reachable from your browser. It is commented out in `docker-compose.yml` by default. Uncomment it before running setup:
+
+```yaml
+# docker-compose.yml — mirabot service
+ports:
+  - "5000:5000"
+  - "8090:8090"   # ← uncomment this line
 ```
 
-A URL will be printed. Open it in your browser, sign in with your Google account, and authorize access. The token is captured automatically via a local callback on port 8090.
+Alternatively, use the included override file so you don't have to edit the main compose file:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.calendar-setup.yml up -d
+```
+
+#### Step 7: Rebuild and authenticate
+
+```bash
+docker compose build --no-cache mirabot
+docker compose up -d mirabot
+docker exec -it mirabot flask calendar-setup
+```
+
+A URL will be printed. Open it in your browser, sign in with your Google account, and authorize access. The token is captured automatically via the local callback on port 8090.
 
 ```
 ============================================================
@@ -389,11 +406,21 @@ https://accounts.google.com/o/oauth2/auth?client_id=...
    - IT Infrastructure Review
 ```
 
-#### Step 7: Verify
+#### Step 8: Close the callback port
+
+Once authorized, comment port `8090` back out (or stop using the override) and restart:
+
+```bash
+docker compose up -d
+```
+
+Port 8090 is not needed again unless you run `calendar-setup` again (e.g. after `calendar-logout`).
+
+#### Step 9: Verify
 
 ```bash
 # Check status and see a calendar preview
-docker exec -it mirror flask calendar-status
+docker exec -it mirabot flask calendar-status
 
 # Check the health endpoint
 curl http://localhost:5000/api/health
@@ -409,17 +436,17 @@ Now ask MiraBot:
 
 ```bash
 # Run interactive OAuth flow
-docker exec -it mirror flask calendar-setup
+docker exec -it mirabot flask calendar-setup
 
 # Check auth status and preview upcoming events
-docker exec -it mirror flask calendar-status
+docker exec -it mirabot flask calendar-status
 
 # Remove stored tokens (logout)
-docker exec -it mirror flask calendar-logout
+docker exec -it mirabot flask calendar-logout
 ```
 
-> **Note:** Port `8090` must be accessible during setup for the OAuth callback.
-> It's mapped in `docker-compose.yml` and can be removed after setup is complete.
+> **Note:** Port `8090` is only needed during `flask calendar-setup`. It is commented out
+> in `docker-compose.yml` by default — open it for setup, then close it again.
 
 ### Outlook.com (Coming in v1.3)
 
@@ -598,8 +625,8 @@ mirabot/
 | `Connection refused` to Ollama                  | Ollama not listening on 0.0.0.0                | Set `OLLAMA_HOST=0.0.0.0` and restart Ollama       |
 | `localhost` doesn't reach Ollama from container | Docker networking                              | Use `host.docker.internal` or the machine's IP     |
 | Ollama returns 404                              | Model not pulled or name mismatch              | Run `ollama list` and use the exact name in config |
-| Calendar `not authenticated`                    | Haven't run setup yet                          | Run `docker exec -it mirror flask calendar-setup`  |
-| 500 error on `/api/converse`                    | Provider connection issue                      | Check `docker logs mirror` for details             |
+| Calendar `not authenticated`                    | Haven't run setup yet                          | Run `docker exec -it mirabot flask calendar-setup` |
+| 500 error on `/api/converse`                    | Provider connection issue                      | Check `docker logs mirabot` for details            |
 
 ---
 

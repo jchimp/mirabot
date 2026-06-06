@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: mirabot
     ports:
-      - "5000:5000"  
-      - "8090:8090"           # auth callback (only needed during setup)  
+      - "5000:5000"
+     #- "8090:8090"           # auth callback (only needed during setup)
     extra_hosts:
           - "host.docker.internal:host-gateway"   # access to local host
     volumes:

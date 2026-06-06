@@ -1,0 +1,12 @@
+# OAuth callback port — only needed during `flask calendar-setup`.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.calendar-setup.yml up -d
+#   docker exec -it mirabot flask calendar-setup
+#
+# Once authorized, restart without this override to close the port:
+#   docker compose up -d
+services:
+  mirabot:
+    ports:
+      - "8090:8090"
