@@ -9,6 +9,7 @@ NOTES.md
 *.swp
 *.old*
 *.backup*
+*.orig*
 
 #=== Env / Secrets ===
 .env
