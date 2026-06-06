@@ -56,6 +56,10 @@ class LLMProvider(ABC):
     def chat(self, messages: list[dict]) -> str:
         ...
 
+    def chat_stream(self, messages: list[dict]):
+        """Yield response tokens. Default: single chunk from non-streaming chat()."""
+        yield self.chat(messages)
+
     def health(self) -> bool:
         try:
             r = requests.get(self.url, timeout=3)

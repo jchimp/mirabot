@@ -119,8 +119,8 @@ class CalendarContext:
                     end_dt = end_dt.astimezone(tz)
 
                 time_str = (
-                    f"{start_dt.strftime('%-I:%M %p')} – "
-                    f"{end_dt.strftime('%-I:%M %p')}"
+                    f"{int(start_dt.strftime('%I'))}:{start_dt.strftime('%M %p')} – "
+                    f"{int(end_dt.strftime('%I'))}:{end_dt.strftime('%M %p')}"
                 )
 
             summary = event["summary"]

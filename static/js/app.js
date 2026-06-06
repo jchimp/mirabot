@@ -25,6 +25,10 @@
 
     let recording = false;
     let processing = false;
+    let currentResponseMarkdown = '';   // raw markdown of the current assistant turn
+
+    // Configure marked: no sanitization needed for a local single-user app
+    marked.use({ breaks: true, gfm: true });
 
     // ── Init mic ────────────────────────────────────
     try {
@@ -243,12 +247,17 @@
         sessionTitle.dataset.sessionId = session.id;
         convLog.innerHTML = '';
         userTextEl.textContent = '';
-        mirrorTextEl.textContent = '';
+        mirrorTextEl.innerHTML = '';
+        currentResponseMarkdown = '';
 
         messages.forEach(m => {
             const div = document.createElement('div');
             div.className = `log-message ${m.role}`;
-            div.textContent = m.role === 'user' ? `"${m.content}"` : m.content;
+            if (m.role === 'assistant') {
+                div.innerHTML = marked.parse(m.content);
+            } else {
+                div.textContent = `"${m.content}"`;
+            }
             convLog.appendChild(div);
         });
 
@@ -265,8 +274,15 @@
             micBtn.classList.add('recording');
             face.setState('listening');
             statusEl.textContent = 'listening…';
+
+            // Commit the previous exchange to the log before clearing it
+            const prevUser = userTextEl.textContent.replace(/^"|"$/g, '');
+            if (prevUser) appendToLog('user', prevUser);
+            if (currentResponseMarkdown) appendToLog('assistant', currentResponseMarkdown);
+            currentResponseMarkdown = '';
+
             userTextEl.textContent = '';
-            mirrorTextEl.textContent = '';
+            mirrorTextEl.innerHTML = '';
             audio.start();
         } else {
             recording = false;
@@ -296,9 +312,46 @@
         const form = new FormData();
         form.append('audio', blob, 'recording.webm');
 
+        // Audio chunk queue — filled by the stream, drained by playback
+        const audioQueue = [];
+        let queuePlaying = false;
+        let streamDone = false;
+        let cleanupDone = false;
+        let fullResponseText = '';
+
+        // Resolves when stream is done AND audio queue is fully drained
+        let resolveComplete;
+        const completed = new Promise(res => { resolveComplete = res; });
+
+        function checkComplete() {
+            if (cleanupDone || !streamDone || queuePlaying || audioQueue.length > 0) return;
+            cleanupDone = true;
+            stopMouthSync();
+            face.setState('idle');
+            statusEl.textContent = 'tap mic or press space';
+            resolveComplete();
+        }
+
+        async function drainQueue() {
+            if (queuePlaying) return;
+            queuePlaying = true;
+
+            while (audioQueue.length > 0) {
+                const chunk = audioQueue.shift();
+                if (face.state !== 'speaking') {
+                    face.setState('speaking');
+                    statusEl.textContent = 'speaking…';
+                    startMouthSync();
+                }
+                await audio.play(chunk.audio);
+            }
+
+            queuePlaying = false;
+            checkComplete();
+        }
 
         try {
-            const resp = await fetch('/api/converse', {
+            const resp = await fetch('/api/converse/stream', {
                 method: 'POST',
                 body: form,
             });
@@ -308,53 +361,78 @@
                 throw new Error(err.error || 'Server error');
             }
 
-            const data = await resp.json();
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder();
+            let sseBuffer = '';
 
-            // Set our session ID for tracking and exporting
-            if (data.session_id) {
-                sessionTitle.dataset.sessionId = data.session_id;
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                sseBuffer += decoder.decode(value, { stream: true });
+                const lines = sseBuffer.split('\n');
+                sseBuffer = lines.pop(); // hold incomplete trailing line
+
+                for (const line of lines) {
+                    if (!line.startsWith('data: ')) continue;
+                    let event;
+                    try { event = JSON.parse(line.slice(6)); } catch { continue; }
+
+                    if (event.type === 'transcript') {
+                        if (event.text) {
+                            userTextEl.textContent = `"${event.text}"`;
+                            if (sessionTitle.textContent === 'new conversation') {
+                                sessionTitle.textContent = event.text.substring(0, 80);
+                            }
+                        }
+
+                    } else if (event.type === 'chunk') {
+                        fullResponseText += (fullResponseText ? '\n' : '') + event.text;
+                        currentResponseMarkdown = fullResponseText;
+                        mirrorTextEl.innerHTML = marked.parse(fullResponseText);
+                        audioQueue.push(event);
+                        drainQueue(); // intentionally not awaited
+
+                    } else if (event.type === 'done') {
+                        if (event.session_id) sessionTitle.dataset.sessionId = event.session_id;
+                        streamDone = true;
+                        checkComplete(); // fires cleanup if queue already drained
+
+                    } else if (event.type === 'error') {
+                        throw new Error(event.message || 'Stream error');
+                    }
+                }
             }
 
-            // Show transcript
-            if (data.user_text) {
-                userTextEl.textContent = `"${data.user_text}"`;
-                appendToLog('user', data.user_text);
-            }
-            mirrorTextEl.textContent = data.response_text;
-            appendToLog('assistant', data.response_text);
+            // Wait for all audio to finish before releasing the mic
+            await completed;
 
-            // Update session title
-            if (data.user_text && sessionTitle.textContent === 'new conversation') {
-                const title = data.user_text.substring(0, 80);
-                sessionTitle.textContent = title;
-            }
-
-            // Play audio with mouth sync
-            if (data.audio_b64) {
-                face.setState('speaking');
-                statusEl.textContent = 'speaking…';
-                startMouthSync();
-                await audio.play(data.audio_b64);
-                stopMouthSync();
-            }
         } catch (err) {
             console.error('Pipeline error:', err);
             mirrorTextEl.textContent = 'something went wrong — try again';
             statusEl.textContent = 'error';
+            stopMouthSync();
+            face.setState('idle');
+            resolveComplete();
         }
     }
 
     function appendToLog(role, content) {
         const div = document.createElement('div');
         div.className = `log-message ${role}`;
-        div.textContent = role === 'user' ? `"${content}"` : content;
+        if (role === 'assistant') {
+            div.innerHTML = marked.parse(content);
+        } else {
+            div.textContent = `"${content}"`;
+        }
         convLog.appendChild(div);
         convLog.scrollTop = convLog.scrollHeight;
     }
 
     function clearTranscript() {
         userTextEl.textContent = '';
-        mirrorTextEl.textContent = '';
+        mirrorTextEl.innerHTML = '';
+        currentResponseMarkdown = '';
         convLog.innerHTML = '';
     }
 

@@ -31,7 +31,12 @@ with open(CONFIG_PATH, "r") as f:
 
 # ── Flask app ────────────────────────────────────────────
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
+
+_secret = os.environ.get("FLASK_SECRET_KEY")
+if not _secret:
+    raise RuntimeError("FLASK_SECRET_KEY environment variable is required")
+app.secret_key = _secret
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB upload limit
 
 # ── Providers ────────────────────────────────────────────
 providers = create_providers(config)
@@ -123,6 +128,41 @@ def converse():
     except Exception as e:
         log.exception("Pipeline error")
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/converse/stream", methods=["POST"])
+def converse_stream():
+    """
+    SSE streaming pipeline: audio → transcript → sentence chunks with audio → done.
+
+    Event types:
+      data: {"type": "transcript", "text": "..."}
+      data: {"type": "chunk", "text": "...", "audio": "<base64 WAV>"}
+      data: {"type": "done", "session_id": "...", "response_text": "..."}
+      data: {"type": "error", "message": "..."}
+    """
+    audio_file = request.files.get("audio")
+    if not audio_file:
+        return jsonify({"error": "No audio file provided"}), 400
+
+    audio_bytes = audio_file.read()
+    mime_type = audio_file.content_type or "audio/webm"
+    sid = _get_or_create_session()
+    history = memory.get_context(sid)
+
+    def generate():
+        for event in chat_service.converse_stream(audio_bytes, history, mime_type):
+            if event["type"] == "done":
+                if event.get("user_text"):
+                    memory.add_message(sid, "user", event["user_text"])
+                if event.get("response_text"):
+                    memory.add_message(sid, "assistant", event["response_text"])
+                event["session_id"] = sid
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return FlaskResponse(generate(), mimetype="text/event-stream",
+                         headers={"X-Accel-Buffering": "no",
+                                  "Cache-Control": "no-cache"})
 
 
 # ── Session Management ───────────────────────────────────
@@ -219,9 +259,10 @@ def import_session():
         )
     count = 0
     for msg in data["messages"]:
-        if msg["role"] in ("user", "assistant"):
-            memory.add_message(sid, msg["role"], msg["content"])
-            count += 1
+        if msg["role"] not in ("user", "assistant"):
+            continue
+        memory.add_message(sid, msg["role"], msg["content"])
+        count += 1
     session["sid"] = sid
     return jsonify({"session_id": sid, "title": title, "message_count": count})
 

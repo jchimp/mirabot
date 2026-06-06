@@ -709,3 +709,87 @@ body {
 .conversation-log {
     max-height: 150px;         /* slightly taller to match */
 }
+
+
+/* ── Markdown rendering (mirror-text + log assistant messages) ── */
+.mirror-text p,
+.log-message.assistant p {
+    margin: 0.3em 0;
+}
+
+.mirror-text p:first-child,
+.log-message.assistant p:first-child { margin-top: 0; }
+
+.mirror-text p:last-child,
+.log-message.assistant p:last-child  { margin-bottom: 0; }
+
+.mirror-text ul,
+.mirror-text ol,
+.log-message.assistant ul,
+.log-message.assistant ol {
+    margin: 0.3em 0;
+    padding-left: 1.4em;
+    text-align: left;
+}
+
+.mirror-text li,
+.log-message.assistant li {
+    margin: 0.15em 0;
+}
+
+.mirror-text strong,
+.log-message.assistant strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    opacity: 1;
+}
+
+.mirror-text em,
+.log-message.assistant em {
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.mirror-text code,
+.log-message.assistant code {
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+}
+
+.mirror-text pre,
+.log-message.assistant pre {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 0.6em 0.8em;
+    overflow-x: auto;
+    text-align: left;
+    margin: 0.4em 0;
+}
+
+.mirror-text pre code,
+.log-message.assistant pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.8em;
+}
+
+.mirror-text h1, .mirror-text h2, .mirror-text h3,
+.mirror-text h4, .mirror-text h5, .mirror-text h6,
+.log-message.assistant h1, .log-message.assistant h2,
+.log-message.assistant h3 {
+    font-weight: 500;
+    margin: 0.4em 0 0.2em;
+    color: var(--text-primary);
+}
+
+.mirror-text blockquote,
+.log-message.assistant blockquote {
+    border-left: 2px solid var(--border-active);
+    margin: 0.3em 0;
+    padding-left: 0.8em;
+    opacity: 0.75;
+    text-align: left;
+}
