@@ -251,12 +251,7 @@ def import_session():
     sid = memory.create_session()
     original = data.get("session", {})
     title = original.get("title", "Imported conversation")
-    now = datetime.now(timezone.utc).isoformat()
-    with memory._connect() as conn:
-        conn.execute(
-            "UPDATE sessions SET title = ?, updated_at = ? WHERE id = ?",
-            (title, now, sid),
-        )
+    memory.rename_session(sid, title)
     count = 0
     for msg in data["messages"]:
         if msg["role"] not in ("user", "assistant"):

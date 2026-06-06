@@ -30,6 +30,8 @@ class GoogleCalendar(CalendarProvider):
         self.scopes = config.get("scopes", [
             "https://www.googleapis.com/auth/calendar.readonly"
         ])
+        self._service = None        # cached API service object
+        self._service_creds = None  # credentials used to build it
 
     # ── Auth ─────────────────────────────────────
 
@@ -96,7 +98,11 @@ class GoogleCalendar(CalendarProvider):
             return []
 
         try:
-            service = build("calendar", "v3", credentials=creds, cache_discovery=False)
+            # Rebuild the service only when credentials change (e.g. after a token refresh)
+            if self._service is None or self._service_creds is not creds:
+                self._service = build("calendar", "v3", credentials=creds,
+                                      cache_discovery=False)
+                self._service_creds = creds
 
             events_result = (
                 service.events()

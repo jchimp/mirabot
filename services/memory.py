@@ -101,32 +101,19 @@ class MemoryStore:
             conn.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
         log.info("Deleted session: %s", session_id)
 
-    def _update_session_title(self, session_id: str, first_message: str):
-        """Auto-title the session from the first user message."""
-        title = first_message[:80].strip()
-        if len(first_message) > 80:
-            title += "…"
+    def rename_session(self, session_id: str, title: str):
+        """Set an explicit title on a session (e.g. for imported conversations)."""
         now = datetime.now(timezone.utc).isoformat()
         with self._connect() as conn:
             conn.execute(
-                "UPDATE sessions SET title = ?, updated_at = ? "
-                "WHERE id = ? AND title = 'New conversation'",
+                "UPDATE sessions SET title = ?, updated_at = ? WHERE id = ?",
                 (title, now, session_id),
-            )
-
-    def _touch_session(self, session_id: str):
-        """Update the session's updated_at timestamp."""
-        now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as conn:
-            conn.execute(
-                "UPDATE sessions SET updated_at = ? WHERE id = ?",
-                (now, session_id),
             )
 
     # ── Messages ─────────────────────────────────────
 
     def add_message(self, session_id: str, role: str, content: str):
-        """Store a message and update session metadata."""
+        """Store a message and update session metadata — one connection for all three writes."""
         now = datetime.now(timezone.utc).isoformat()
         with self._connect() as conn:
             conn.execute(
@@ -134,12 +121,19 @@ class MemoryStore:
                 "VALUES (?, ?, ?, ?)",
                 (session_id, role, content, now),
             )
-
-        # Auto-title on first user message
-        if role == "user":
-            self._update_session_title(session_id, content)
-
-        self._touch_session(session_id)
+            # Auto-title from first user message
+            if role == "user":
+                title = content[:80].strip() + ("…" if len(content) > 80 else "")
+                conn.execute(
+                    "UPDATE sessions SET title = ?, updated_at = ? "
+                    "WHERE id = ? AND title = 'New conversation'",
+                    (title, now, session_id),
+                )
+            else:
+                conn.execute(
+                    "UPDATE sessions SET updated_at = ? WHERE id = ?",
+                    (now, session_id),
+                )
 
     def get_messages(self, session_id: str) -> list[dict]:
         """Get ALL messages for a session (for display)."""
