@@ -104,7 +104,7 @@ cryptography>=42.0
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/mirabot.git
+git clone https://github.com/jchimp/mirabot.git
 cd mirabot
 ```
 
@@ -248,7 +248,7 @@ llm:
 
 > **Important:** Ollama must listen on all interfaces, not just localhost.
 > Set the environment variable `OLLAMA_HOST=0.0.0.0` and restart Ollama.
-> 
+>
 > The model name in `config.yaml` must match exactly what `ollama list` shows.
 
 ---
