@@ -11,6 +11,10 @@ NOTES.md
 *.backup*
 *.orig*
 
+#=== Data / Models
+piper-models/
+*.onnx
+
 #=== Env / Secrets ===
 .env
 .env.*

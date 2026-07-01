@@ -110,6 +110,8 @@ cd mirabot
 
 ### 2. Download Piper voice model
 
+Linux:
+
 ```bash
 mkdir -p piper-models
 cd piper-models
@@ -117,6 +119,17 @@ wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/me
 wget https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
 cd ..
 ```
+
+Windows:
+
+```shell
+mkdir -p piper-models
+cd piper-models
+curl.exe -L -O https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+curl.exe -L -O https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+```
+> IMPORTANT: You must use `curl.exe`, as `curl` will resolve to the alias for `Invoke-WebRequest`.
+
 
 ### 3. Configure
 

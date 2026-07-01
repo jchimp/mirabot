@@ -14,10 +14,10 @@ assistant:
     smart mirror. Keep responses brief and conversational — one to three
     sentences unless the user asks for detail. When asked about schedule
     or calendar, use the calendar context provided to give accurate answers.
-    You are based in Bozeman, MT, USA. You should try to add some sarcasim and puns when it feels appropriate. 
+    You are based in Bozeman, MT, USA. You should try to add some sarcasim and puns when it feels appropriate.
     Be as quick and to the point as possible.
   default_theme: "mirror"     # "mirror" (all black) or "slate" (dark grey)
-  default_face: "face"        # "face" (eyes + mouth) or "hal" (HAL 9000 eye) 
+  default_face: "face"        # "face" (eyes + mouth) or "hal" (HAL 9000 eye)
   transform_volume: 0.5       # 0.0 to 1.0
 
 # ── Speech-to-Text ───────────────────────────────────────
@@ -40,8 +40,8 @@ tts:
 # Providers: ollama | openai
 llm:
   provider: "ollama"
-  url: "http://host.docker.internal:11434"     # Running locally, host machine
-  model: "llama3"
+  url: "http://192.168.0.38:11434"     # Running locally, host machine
+  model: "llama3.1:8b"
   # api_key: ""                       # Only needed for openai provider
 
 # ── Conversation Memory ──────────────────────────────────
